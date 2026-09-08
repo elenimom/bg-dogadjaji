@@ -1,9 +1,10 @@
+import { eventRoutes } from './events/routes.js';
 import express from 'express';
 import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
 import { authRoutes } from './auth/routes.js';
 
-export function createApp({ repository, origin, secure = false } = {}) {
+export function createApp({ repository, events, origin, secure = false } = {}) {
   const app = express();
   app.use(helmet());
   app.use(express.json({ limit: '32kb' }));
@@ -13,6 +14,7 @@ export function createApp({ repository, origin, secure = false } = {}) {
     skip: req => req.method === 'GET',
     message: { error: { code: 'RATE_LIMITED', message: 'Previše pokušaja. Pokušajte kasnije.' } }
   }), authRoutes(repository, { origin, secure }));
+  if (events) app.use('/api', eventRoutes(events));
   app.use((_req, res) => res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Ruta nije pronađena.' } }));
   app.use((err, _req, res, _next) => {
     const status = [400, 413].includes(err.status) ? err.status : 500;

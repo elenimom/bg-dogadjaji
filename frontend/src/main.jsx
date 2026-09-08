@@ -4,6 +4,7 @@ import { BrowserRouter, Link, Navigate, Route, Routes, useNavigate } from 'react
 import { api } from './api';
 import { Button, Field, Notice } from './components';
 import './style.css';
+import { Events, EventDetails } from './events';
 
 const Auth = createContext();
 function AuthProvider({ children }) {
@@ -24,8 +25,8 @@ function Home() {
     <h1>Šta se dešava<br/><em>u Beogradu?</em></h1>
     <p className="intro">Izložbe, stand-up, svirke i mala otkrića koja menjaju planove.</p>
     <section><h2>Tvoj sledeći izlazak počinje ovde</h2>
-    <p>Pregled događaja je u pripremi. Već možeš da napraviš nalog i prijaviš se.</p>
-    <Link className="button" to="/register">Napravi nalog</Link></section></>;
+    <p>Pronađi događaj prema svom ukusu, datumu i budžetu.</p>
+    <Link className="button" to="/events">Istraži događaje</Link></section></>;
 }
 function AuthForm({ register = false }) {
   const { user, setUser, loading, setError: clearGlobal } = useContext(Auth);
@@ -83,10 +84,11 @@ function App() {
     catch (e) { setError(e.message); } finally { setPending(false); }
   }
   return <><header><Link to="/" className="brand">BG<span> događaji</span></Link>
-    <nav aria-label="Glavna navigacija"><Link to="/">Početna</Link>
+    <nav aria-label="Glavna navigacija"><Link to="/">Početna</Link><Link to="/events">Događaji</Link>
     {!loading && (user ? <><Link to="/account">Moj nalog</Link><Button onClick={logout} disabled={pending}>{pending ? 'Sačekaj…' : 'Odjavi se'}</Button></> : <><Link to="/login">Prijava</Link><Link to="/register">Registracija</Link></>)}</nav></header>
     <main><Notice error>{error}</Notice><Routes>
       <Route path="/" element={<Home/>}/>
+      <Route path="/events" element={<Events/>}/><Route path="/events/:id" element={<EventDetails/>}/>
       <Route path="/login" element={<AuthForm key="login"/>}/>
       <Route path="/register" element={<AuthForm key="register" register/>}/>
       <Route path="/account" element={<Account/>}/>
