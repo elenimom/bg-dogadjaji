@@ -39,3 +39,8 @@ API provera: http://localhost:3001/api/health.
 Trenutna verzija sadrži početnu stranicu i proveru API veze.
 Baza, autentifikacija, događaji, Docker i Swagger još nisu implementirani.
 Objašnjenja pojmova nalaze se u docs/POJMOVI.md.
+
+## Swagger API dokumentacija
+Uz pokrenutu aplikaciju otvoriti http://localhost:5173/api/docs/.
+Specifikacija je na /api/openapi.json i u backend/src/docs/openapi.json.
+Za uputstvo i autentifikaciju pogledati docs/SWAGGER.md.

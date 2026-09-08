@@ -1,3 +1,4 @@
+import { docsRoutes } from './docs/routes.js';
 import { integrationRoutes } from './integrations/routes.js';
 import { adminRoutes } from './admin/routes.js';
 import { savedRoutes } from './events/saved.js';
@@ -10,7 +11,8 @@ import { authRoutes } from './auth/routes.js';
 
 export function createApp({ repository, events, admin, origin, secure = false } = {}) {
   const app = express();
-  app.use(helmet());
+  app.use(helmet({ contentSecurityPolicy: { directives: { 'upgrade-insecure-requests': secure ? [] : null } } }));
+  app.use('/api', docsRoutes());
   app.use(express.json({ limit: '32kb' }));
   app.get('/api/health', (_req, res) => res.json({ status: 'ok', service: 'bg-events-api' }));
   if (repository) app.use('/api/auth', rateLimit({
