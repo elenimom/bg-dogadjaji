@@ -17,3 +17,6 @@ requireRole proverava uloge; povezivanje sa budućim rutama organizatora i admin
 
 Migracija 004 dodaje sessions. Testovi auth.test.js koriste zamensku bazu u memoriji i proveravaju HTTP ponašanje, ne PostgreSQL integraciju.
 Frontend forme još nisu dodate.
+
+## Frontend forme
+Dodate su rute /login, /register i /account. AuthProvider proverava sesiju preko /api/auth/me. Field, Button i Notice koriste se ponovo. Forme prikazuju greške i sprečavaju ponovno slanje dok zahtev traje. Odjava poziva backend pre uklanjanja naloga iz prikaza. Provera kompletnog toka u pregledaču sa PostgreSQL bazom još predstoji.
