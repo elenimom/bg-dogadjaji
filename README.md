@@ -52,3 +52,7 @@ docker compose up -d --build
 ```
 
 Aplikacija: http://localhost:5173. Uputstvo: [docs/DOCKER.md](docs/DOCKER.md).
+
+## Organizacija backenda
+
+Tok zahteva i raspored ruta, kontrolera i repozitorijuma opisani su u [docs/ARHITEKTURA_BACKENDA.md](docs/ARHITEKTURA_BACKENDA.md).
