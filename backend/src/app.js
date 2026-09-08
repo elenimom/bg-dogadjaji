@@ -1,3 +1,4 @@
+import { savedRoutes } from './events/saved.js';
 import { manageRoutes } from './events/manage.js';
 import { eventRoutes } from './events/routes.js';
 import express from 'express';
@@ -15,6 +16,7 @@ export function createApp({ repository, events, origin, secure = false } = {}) {
     skip: req => req.method === 'GET',
     message: { error: { code: 'RATE_LIMITED', message: 'Previše pokušaja. Pokušajte kasnije.' } }
   }), authRoutes(repository, { origin, secure }));
+  if (events && repository) app.use('/api/saved-events', savedRoutes(events, repository, { origin }));
   if (events && repository) app.use('/api/manage', manageRoutes(events, repository, { origin }));
   if (events) app.use('/api', eventRoutes(events));
   app.use((_req, res) => res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Ruta nije pronađena.' } }));

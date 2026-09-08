@@ -28,3 +28,12 @@ pnpm --dir backend db:role EMAIL organizer
 Ovo je administratorska terminalska skripta, ne javna API ruta.
 Posle dodele osvežiti stranicu. Ne menjati ulogu običnim zahtevom registracije.
 Provere prave PostgreSQL baze i browser toka ovog dela još predstoje.
+
+## Želim da idem
+GET /api/saved-events vraća listu isključivo korisnika iz sesije.
+POST /api/saved-events/:id čuva događaj, DELETE uklanja vezu sa korisnikom.
+user_id iz tela ili query parametara ne koristi se za izbor vlasnika.
+Postojeća tabela saved_events sprečava duplikate; nije potrebna nova migracija.
+Frontend ima dugme na detaljima i stranicu /saved sa uklanjanjem.
+Brisanje događaja kaskadno uklanja veze iz saved_events.
+Testovi koriste zamenski repository i proveru SQL parametara; ručni tok sa bazom još treba potvrditi.

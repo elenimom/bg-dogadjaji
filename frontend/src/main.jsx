@@ -4,6 +4,7 @@ import { BrowserRouter, Link, Navigate, Route, Routes, useNavigate } from 'react
 import { api } from './api';
 import { Button, Field, Notice } from './components';
 import './style.css';
+import { SavedEvents } from './saved';
 import { Manage } from './manage';
 import { Events, EventDetails } from './events';
 
@@ -73,7 +74,7 @@ function Account() {
   const roles = { visitor: 'Posetilac', organizer: 'Organizator', admin: 'Administrator' };
   return <><p className="eyebrow">MOJ NALOG</p><h1 className="small-title">Zdravo, <em>{user.name}.</em></h1>
     <section><h2>Podaci naloga</h2><dl><dt>Email</dt><dd>{user.email}</dd><dt>Uloga</dt><dd>{roles[user.role]}</dd></dl>
-    <p>Lista sačuvanih događaja biće dostupna kada dodamo događaje.</p><Link to="/">Nazad na početnu</Link></section></>;
+    <p>Otvori svoje planove i pogledaj sačuvane događaje.</p><Link to="/">Nazad na početnu</Link></section></>;
 }
 function App() {
   const { user, setUser, loading, error, setError } = useContext(Auth);
@@ -86,12 +87,13 @@ function App() {
   }
   return <><header><Link to="/" className="brand">BG<span> događaji</span></Link>
     <nav aria-label="Glavna navigacija"><Link to="/">Početna</Link><Link to="/events">Događaji</Link>
-    {!loading && (user ? <><Link to="/account">Moj nalog</Link>{['organizer','admin'].includes(user.role)&&<Link to="/manage">Upravljanje</Link>}<Button onClick={logout} disabled={pending}>{pending ? 'Sačekaj…' : 'Odjavi se'}</Button></> : <><Link to="/login">Prijava</Link><Link to="/register">Registracija</Link></>)}</nav></header>
+    {!loading && (user ? <><Link to="/account">Moj nalog</Link><Link to="/saved">Želim da idem</Link>{['organizer','admin'].includes(user.role)&&<Link to="/manage">Upravljanje</Link>}<Button onClick={logout} disabled={pending}>{pending ? 'Sačekaj…' : 'Odjavi se'}</Button></> : <><Link to="/login">Prijava</Link><Link to="/register">Registracija</Link></>)}</nav></header>
     <main><Notice error>{error}</Notice><Routes>
       <Route path="/" element={<Home/>}/>
-      <Route path="/events" element={<Events/>}/><Route path="/events/:id" element={<EventDetails/>}/>
+      <Route path="/events" element={<Events/>}/><Route path="/events/:id" element={<EventDetails user={user}/>}/>
       <Route path="/login" element={<AuthForm key="login"/>}/>
       <Route path="/register" element={<AuthForm key="register" register/>}/>
+      <Route path="/saved" element={<SavedEvents user={user} loading={loading}/>}/>
       <Route path="/manage" element={<Manage user={user} loading={loading}/>}/>
       <Route path="/account" element={<Account/>}/>
       <Route path="*" element={<><h1 className="small-title">Stranica nije pronađena.</h1><Link to="/">Vrati se na početnu</Link></>}/>

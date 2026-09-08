@@ -1,5 +1,6 @@
 import React, {useEffect,useState} from 'react';
 import {Link,useParams,useSearchParams} from 'react-router-dom';
+import {SaveButton} from './saved';
 import {api} from './api';
 import {Button,Field,Notice} from './components';
 const dateLabel=value=>new Intl.DateTimeFormat('sr-Latn-RS',{dateStyle:'medium',timeStyle:'short',timeZone:'Europe/Belgrade'}).format(new Date(value));
@@ -27,12 +28,12 @@ export function Events(){
  {!data.events.length&&<p>Nema događaja za izabrane filtere. Pokušaj drugačiju pretragu.</p>}
  <div className="pagination"><Button disabled={data.page<=1} onClick={()=>page(-1)}>Prethodna</Button><span>Strana {data.page}</span><Button disabled={data.page*data.pageSize>=data.total} onClick={()=>page(1)}>Sledeća</Button></div></>}</>;
 }
-export function EventDetails(){
+export function EventDetails({user}){
  const {id}=useParams();const [event,setEvent]=useState(null),[error,setError]=useState('');
  useEffect(()=>{const c=new AbortController();setEvent(null);setError('');api('/events/'+id,{signal:c.signal}).then(d=>setEvent(d.event)).catch(e=>{if(e.name!=='AbortError')setError(e.message)});return()=>c.abort();},[id]);
  if(error)return <><Notice error>{error}</Notice><Link to="/events">Svi događaji</Link></>;
  if(!event)return <Notice>Učitavanje događaja…</Notice>;
  let ticket;try{const url=new URL(event.ticket_url);if(['https:','http:'].includes(url.protocol))ticket=url.href;}catch{}
  return <><Link to="/events">← Svi događaji</Link><p className="eyebrow">{event.category_name}</p><h1 className="small-title">{event.title}</h1>
- <div className="details-layout"><section><h2>O događaju</h2><p className="description">{event.description}</p></section><section><h2>Isplaniraj dolazak</h2><dl><dt>Kada</dt><dd>{dateLabel(event.starts_at)}</dd><dt>Gde</dt><dd>{event.location_name}<br/>{event.address}</dd><dt>Cena</dt><dd>{priceLabel(event.price)}</dd><dt>Organizator</dt><dd>{event.organizer_name}</dd></dl>{ticket&&<a className="button" href={ticket} target="_blank" rel="noopener noreferrer">Informacije o kartama</a>}</section></div></>;
+ <div className="details-layout"><section><h2>O događaju</h2><p className="description">{event.description}</p></section><section><h2>Isplaniraj dolazak</h2><SaveButton eventId={event.id} user={user}/><dl><dt>Kada</dt><dd>{dateLabel(event.starts_at)}</dd><dt>Gde</dt><dd>{event.location_name}<br/>{event.address}</dd><dt>Cena</dt><dd>{priceLabel(event.price)}</dd><dt>Organizator</dt><dd>{event.organizer_name}</dd></dl>{ticket&&<a className="button" href={ticket} target="_blank" rel="noopener noreferrer">Informacije o kartama</a>}</section></div></>;
 }

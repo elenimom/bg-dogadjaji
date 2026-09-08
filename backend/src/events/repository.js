@@ -16,6 +16,12 @@ export function eventRepository(pool) {
    const rows=await pool.query(selection+clause+' ORDER BY e.starts_at,e.id LIMIT 12 OFFSET '+param((page-1)*12),values);
    return {events:rows.rows,total:count.rows[0].total,page,pageSize:12};
   },
+  async saved(userId) {return (await pool.query(selection+' JOIN saved_events s ON s.event_id=e.id WHERE s.user_id=$1 ORDER BY e.starts_at,e.id',[userId])).rows;},
+  async save(userId,eventId) {
+   const result=await pool.query('INSERT INTO saved_events(user_id,event_id) SELECT $1,id FROM events WHERE id=$2 ON CONFLICT(user_id,event_id) DO UPDATE SET user_id=EXCLUDED.user_id RETURNING event_id',[userId,eventId]);
+   return result.rowCount>0;
+  },
+  async unsave(userId,eventId) {await pool.query('DELETE FROM saved_events WHERE user_id=$1 AND event_id=$2',[userId,eventId]);},
   async owned(user) { return (await pool.query(selection+(user.role==='admin'?'':' WHERE e.organizer_id=$1')+' ORDER BY e.starts_at DESC',user.role==='admin'?[]:[user.id])).rows; },
   async locations() { return (await pool.query('SELECT * FROM locations ORDER BY name')).rows; },
   async create(data,userId) {
