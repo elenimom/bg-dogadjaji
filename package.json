@@ -1,0 +1,16 @@
+{
+  "name": "bg-events",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -k \"pnpm --dir backend dev\" \"pnpm --dir frontend dev\"",
+    "build": "pnpm --dir frontend build",
+    "test": "pnpm --dir backend test"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  },
+  "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

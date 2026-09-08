@@ -23,3 +23,19 @@ React, Node.js, Express i PostgreSQL.
 
 Projekat je u početnoj fazi razvoja.
 Uputstvo za pokretanje biće dodato tokom implementacije.
+## Pokretanje početne razvojne verzije
+
+Potrebni su Node.js 22.12 ili noviji i pnpm 11.19.0.
+Instalacija pnpm-a: `npm install -g pnpm@11.19.0`.
+
+Iz korena projekta:
+- `pnpm install` instalira biblioteke.
+- `pnpm dev` pokreće frontend i backend.
+- Otvorite http://localhost:5173.
+- `pnpm test` pokreće API testove.
+- `pnpm build` pravi frontend produkcioni paket.
+
+API provera: http://localhost:3001/api/health.
+Trenutna verzija sadrži početnu stranicu i proveru API veze.
+Baza, autentifikacija, događaji, Docker i Swagger još nisu implementirani.
+Objašnjenja pojmova nalaze se u docs/POJMOVI.md.
