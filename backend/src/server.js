@@ -1,3 +1,4 @@
+import { adminRepository } from './admin/repository.js';
 import { eventRepository } from './events/repository.js';
 import { createApp } from './app.js';
 import { createPool } from './db.js';
@@ -6,6 +7,6 @@ const pool = createPool();
 await pool.query('SELECT 1');
 const secure = process.env.NODE_ENV === 'production';
 if (secure && !process.env.APP_ORIGIN?.startsWith('https://')) throw new Error('Produkcija zahteva HTTPS APP_ORIGIN.');
-const app = createApp({ repository: authRepository(pool), events: eventRepository(pool), origin: process.env.APP_ORIGIN || 'http://localhost:5173', secure });
+const app = createApp({ repository: authRepository(pool), events: eventRepository(pool), admin: adminRepository(pool), origin: process.env.APP_ORIGIN || 'http://localhost:5173', secure });
 const server = app.listen(Number(process.env.PORT || 3001), () => console.log('API je spreman.'));
 for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => server.close(async () => { await pool.end(); process.exit(0); }));

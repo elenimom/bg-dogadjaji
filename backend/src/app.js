@@ -1,3 +1,4 @@
+import { adminRoutes } from './admin/routes.js';
 import { savedRoutes } from './events/saved.js';
 import { manageRoutes } from './events/manage.js';
 import { eventRoutes } from './events/routes.js';
@@ -6,7 +7,7 @@ import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
 import { authRoutes } from './auth/routes.js';
 
-export function createApp({ repository, events, origin, secure = false } = {}) {
+export function createApp({ repository, events, admin, origin, secure = false } = {}) {
   const app = express();
   app.use(helmet());
   app.use(express.json({ limit: '32kb' }));
@@ -16,6 +17,7 @@ export function createApp({ repository, events, origin, secure = false } = {}) {
     skip: req => req.method === 'GET',
     message: { error: { code: 'RATE_LIMITED', message: 'Previše pokušaja. Pokušajte kasnije.' } }
   }), authRoutes(repository, { origin, secure }));
+  if (admin && repository) app.use('/api/admin', adminRoutes(admin, repository, { origin }));
   if (events && repository) app.use('/api/saved-events', savedRoutes(events, repository, { origin }));
   if (events && repository) app.use('/api/manage', manageRoutes(events, repository, { origin }));
   if (events) app.use('/api', eventRoutes(events));

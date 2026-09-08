@@ -4,6 +4,7 @@ import { BrowserRouter, Link, Navigate, Route, Routes, useNavigate } from 'react
 import { api } from './api';
 import { Button, Field, Notice } from './components';
 import './style.css';
+import { Admin } from './admin';
 import { SavedEvents } from './saved';
 import { Manage } from './manage';
 import { Events, EventDetails } from './events';
@@ -87,12 +88,13 @@ function App() {
   }
   return <><header><Link to="/" className="brand">BG<span> događaji</span></Link>
     <nav aria-label="Glavna navigacija"><Link to="/">Početna</Link><Link to="/events">Događaji</Link>
-    {!loading && (user ? <><Link to="/account">Moj nalog</Link><Link to="/saved">Želim da idem</Link>{['organizer','admin'].includes(user.role)&&<Link to="/manage">Upravljanje</Link>}<Button onClick={logout} disabled={pending}>{pending ? 'Sačekaj…' : 'Odjavi se'}</Button></> : <><Link to="/login">Prijava</Link><Link to="/register">Registracija</Link></>)}</nav></header>
+    {!loading && (user ? <><Link to="/account">Moj nalog</Link><Link to="/saved">Želim da idem</Link>{['organizer','admin'].includes(user.role)&&<Link to="/manage">Upravljanje</Link>}{user.role==='admin'&&<Link to="/admin">Administracija</Link>}<Button onClick={logout} disabled={pending}>{pending ? 'Sačekaj…' : 'Odjavi se'}</Button></> : <><Link to="/login">Prijava</Link><Link to="/register">Registracija</Link></>)}</nav></header>
     <main><Notice error>{error}</Notice><Routes>
       <Route path="/" element={<Home/>}/>
       <Route path="/events" element={<Events/>}/><Route path="/events/:id" element={<EventDetails user={user}/>}/>
       <Route path="/login" element={<AuthForm key="login"/>}/>
       <Route path="/register" element={<AuthForm key="register" register/>}/>
+      <Route path="/admin" element={<Admin user={user} loading={loading} onUserChange={setUser}/>}/>
       <Route path="/saved" element={<SavedEvents user={user} loading={loading}/>}/>
       <Route path="/manage" element={<Manage user={user} loading={loading}/>}/>
       <Route path="/account" element={<Account/>}/>
