@@ -1,5 +1,6 @@
 import React,{useEffect,useState} from 'react';
 import {Navigate} from 'react-router-dom';
+import {LocationSearch} from './integrations';
 import {api} from './api';
 import {Button,Field,Notice} from './components';
 function Resources({kind}){
@@ -15,7 +16,7 @@ function Resources({kind}){
  }catch(e){setError(e.message);}finally{setBusy(false);}}
  async function remove(item){if(!window.confirm('Obrisati „'+item.name+'“?'))return;setBusy(true);setError('');setMessage('');try{await api('/admin/'+kind+'/'+item.id,{method:'DELETE',body:{}});await refresh();if(id===item.id){setId(null);setForm(blank);}setMessage('Obrisano.');}catch(e){setError(e.message);}finally{setBusy(false);}}
  return <section><h2>{location?'Lokacije':'Kategorije'}</h2><Notice error>{error}</Notice><Notice>{message}</Notice>
- <form onSubmit={save}><fieldset disabled={busy}><Field label="Naziv" name="name" value={form.name} onChange={change} required minLength={2} maxLength={location?150:80}/>
+ {location&&<LocationSearch onChoose={r=>setForm({...form,name:r.name.slice(0,150),address:r.address.slice(0,250),latitude:r.latitude,longitude:r.longitude})}/>}<form onSubmit={save}><fieldset disabled={busy}><Field label="Naziv" name="name" value={form.name} onChange={change} required minLength={2} maxLength={location?150:80}/>
  {location&&<><Field label="Adresa" name="address" value={form.address} onChange={change} required minLength={3} maxLength={250}/><div className="form-columns"><Field label="Geografska širina" name="latitude" type="number" min="-90" max="90" step="any" value={form.latitude} onChange={change} required/><Field label="Geografska dužina" name="longitude" type="number" min="-180" max="180" step="any" value={form.longitude} onChange={change} required/></div><p className="hint">Koordinate su potrebne za budući prikaz lokacije na mapi.</p></>}
  <Button>{busy?'Sačekaj…':id?'Sačuvaj izmenu':'Dodaj'}</Button>{id&&<Button type="button" onClick={()=>{setId(null);setForm(blank);}}>Otkaži</Button>}</fieldset></form>
  <div className="manage-list">{items.map(item=><article key={item.id}><div><strong>{item.name}</strong>{location&&<p>{item.address}</p>}</div><div className="actions"><Button disabled={busy} onClick={()=>{setId(item.id);setForm({...blank,...item});}}>Izmeni</Button><Button disabled={busy} onClick={()=>remove(item)}>Obriši</Button></div></article>)}</div></section>;

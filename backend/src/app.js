@@ -1,3 +1,4 @@
+import { integrationRoutes } from './integrations/routes.js';
 import { adminRoutes } from './admin/routes.js';
 import { savedRoutes } from './events/saved.js';
 import { manageRoutes } from './events/manage.js';
@@ -20,6 +21,7 @@ export function createApp({ repository, events, admin, origin, secure = false } 
   if (admin && repository) app.use('/api/admin', adminRoutes(admin, repository, { origin }));
   if (events && repository) app.use('/api/saved-events', savedRoutes(events, repository, { origin }));
   if (events && repository) app.use('/api/manage', manageRoutes(events, repository, { origin }));
+  if (events) app.use('/api/integrations', integrationRoutes(events));
   if (events) app.use('/api', eventRoutes(events));
   app.use((_req, res) => res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Ruta nije pronađena.' } }));
   app.use((err, _req, res, _next) => {

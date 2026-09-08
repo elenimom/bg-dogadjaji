@@ -1,5 +1,6 @@
 import React, {useEffect,useState} from 'react';
 import {Link,useParams,useSearchParams} from 'react-router-dom';
+import {EventsMap,Weather} from './integrations';
 import {SaveButton} from './saved';
 import {api} from './api';
 import {Button,Field,Notice} from './components';
@@ -24,7 +25,7 @@ export function Events(){
  <Field label="Cena do (RSD)" name="maxPrice" type="number" min="0" max="99999999" step="0.01" defaultValue={params.get('maxPrice')||''}/>
  <Button type="submit">Pronađi</Button><Link to="/events">Poništi filtere</Link></form>
  <Notice error>{error}</Notice>{!data&&!error&&<Notice>Učitavanje događaja…</Notice>}
- {data&&<><p role="status">{data.total} događaja odgovara pretrazi.</p><div className="event-grid">{data.events.map(e=><EventCard event={e} key={e.id}/>)}</div>
+ {data&&<><p role="status">{data.total} događaja odgovara pretrazi.</p><EventsMap events={data.events}/><div className="event-grid">{data.events.map(e=><EventCard event={e} key={e.id}/>)}</div>
  {!data.events.length&&<p>Nema događaja za izabrane filtere. Pokušaj drugačiju pretragu.</p>}
  <div className="pagination"><Button disabled={data.page<=1} onClick={()=>page(-1)}>Prethodna</Button><span>Strana {data.page}</span><Button disabled={data.page*data.pageSize>=data.total} onClick={()=>page(1)}>Sledeća</Button></div></>}</>;
 }
@@ -35,5 +36,5 @@ export function EventDetails({user}){
  if(!event)return <Notice>Učitavanje događaja…</Notice>;
  let ticket;try{const url=new URL(event.ticket_url);if(['https:','http:'].includes(url.protocol))ticket=url.href;}catch{}
  return <><Link to="/events">← Svi događaji</Link><p className="eyebrow">{event.category_name}</p><h1 className="small-title">{event.title}</h1>
- <div className="details-layout"><section><h2>O događaju</h2><p className="description">{event.description}</p></section><section><h2>Isplaniraj dolazak</h2><SaveButton eventId={event.id} user={user}/><dl><dt>Kada</dt><dd>{dateLabel(event.starts_at)}</dd><dt>Gde</dt><dd>{event.location_name}<br/>{event.address}</dd><dt>Cena</dt><dd>{priceLabel(event.price)}</dd><dt>Organizator</dt><dd>{event.organizer_name}</dd></dl>{ticket&&<a className="button" href={ticket} target="_blank" rel="noopener noreferrer">Informacije o kartama</a>}</section></div></>;
+ <div className="details-layout"><section><h2>O događaju</h2><p className="description">{event.description}</p></section><section><h2>Isplaniraj dolazak</h2><Weather eventId={event.id}/><SaveButton eventId={event.id} user={user}/><dl><dt>Kada</dt><dd>{dateLabel(event.starts_at)}</dd><dt>Gde</dt><dd>{event.location_name}<br/>{event.address}</dd><dt>Cena</dt><dd>{priceLabel(event.price)}</dd><dt>Organizator</dt><dd>{event.organizer_name}</dd></dl>{ticket&&<a className="button" href={ticket} target="_blank" rel="noopener noreferrer">Informacije o kartama</a>}</section></div></>;
 }
