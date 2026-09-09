@@ -1,0 +1,65 @@
+name: Testovi i Docker
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    name: API testovi i frontend build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Instalacija pnpm-a
+        run: npm install --global pnpm@11.19.0
+      - name: Instalacija zavisnosti
+        run: pnpm install --frozen-lockfile
+      - name: API testovi
+        run: pnpm test
+      - name: Izgradnja frontenda
+        run: pnpm build
+
+  docker:
+    name: Docker build i provera pokretanja
+    needs: tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Samo za privremenu CI bazu; nije lozinka lokalne ili produkcione baze.
+      DB_PASSWORD: ci_disposable_database_password
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Provera Compose konfiguracije
+        run: docker compose config --quiet
+      - name: Izgradnja i pokretanje kontejnera
+        run: docker compose up -d --build
+      - name: Provera frontenda i API-ja preko Nginx-a
+        shell: bash
+        run: |
+          curl --fail --silent --show-error --retry 12 --retry-connrefused --retry-delay 2 http://localhost:5173/api/health -o /tmp/health.json
+          python3 -c "import json; assert json.load(open('/tmp/health.json'))['status'] == 'ok'"
+          curl --fail --silent --show-error http://localhost:5173/ -o /tmp/frontend.html
+          grep -q 'id="root"' /tmp/frontend.html
+          curl --fail --silent --show-error http://localhost:5173/api/openapi.json -o /tmp/openapi.json
+          python3 -c "import json; assert json.load(open('/tmp/openapi.json'))['openapi'] == '3.0.3'"
+          curl --fail --silent --show-error http://localhost:5173/api/events -o /tmp/events.json
+          python3 -c "import json; assert isinstance(json.load(open('/tmp/events.json'))['events'], list)"
+      - name: Logovi u slucaju greske
+        if: failure()
+        run: docker compose logs --no-color --tail=100
+      - name: Zaustavljanje CI kontejnera
+        if: always()
+        run: docker compose down
