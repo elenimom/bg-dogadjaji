@@ -1,3 +1,4 @@
+import { resolve, extname } from 'node:path';
 import { docsRoutes } from './docs/routes.js';
 import { integrationRoutes } from './integrations/routes.js';
 import { adminRoutes } from './admin/routes.js';
@@ -9,9 +10,10 @@ import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
 import { authRoutes } from './auth/routes.js';
 
-export function createApp({ repository, events, admin, origin, secure = false } = {}) {
+export function createApp({ repository, events, admin, origin, secure = false, frontendDir, trustProxy = false } = {}) {
   const app = express();
-  app.use(helmet({ contentSecurityPolicy: { directives: { 'upgrade-insecure-requests': secure ? [] : null } } }));
+  app.set('trust proxy', trustProxy);
+  app.use(helmet({ contentSecurityPolicy: { directives: { 'upgrade-insecure-requests': secure ? [] : null, 'img-src': ["'self'", 'data:', 'https://tile.openstreetmap.org'], 'connect-src': ["'self'"] } } }));
   app.use('/api', docsRoutes());
   app.use(express.json({ limit: '32kb' }));
   app.get('/api/health', (_req, res) => res.json({ status: 'ok', service: 'bg-events-api' }));
@@ -25,6 +27,16 @@ export function createApp({ repository, events, admin, origin, secure = false } 
   if (events && repository) app.use('/api/manage', manageRoutes(events, repository, { origin }));
   if (events) app.use('/api/integrations', integrationRoutes(events));
   if (events) app.use('/api', eventRoutes(events));
+  if (frontendDir) {
+    const directory = resolve(frontendDir);
+    // API greske ostaju JSON, cak i kada pregledač trazi HTML.
+    app.use('/api', (_req, res) => res.status(404).json({error:{code:'NOT_FOUND',message:'Ruta nije pronađena.'}}));
+    app.use(express.static(directory));
+    app.get(/.*/, (req, res, next) => {
+      if (extname(req.path) || !req.accepts('html')) return next();
+      res.sendFile(resolve(directory, 'index.html'));
+    });
+  }
   app.use((_req, res) => res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Ruta nije pronađena.' } }));
   app.use((err, _req, res, _next) => {
     const status = [400, 413].includes(err.status) ? err.status : 500;

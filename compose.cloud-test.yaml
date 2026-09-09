@@ -1,0 +1,25 @@
+# Samo za lokalnu/CI proveru Render slike; koristi lokalnu Docker bazu.
+services:
+  cloud:
+    build:
+      context: .
+      dockerfile: Dockerfile.render
+    environment:
+      NODE_ENV: production
+      SERVE_FRONTEND: 'true'
+      APP_ORIGIN: https://example.invalid
+      PGHOST: db
+      PGPORT: 5432
+      PGDATABASE: bg_events
+      PGUSER: bg_events
+      PGPASSWORD: ${DB_PASSWORD:?Postavi DB_PASSWORD}
+    ports:
+      - '127.0.0.1:5174:3001'
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:3001/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 12

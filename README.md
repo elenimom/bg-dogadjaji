@@ -64,3 +64,7 @@ GitHub Actions konfiguracija pokrece testove, frontend build i Docker proveru na
 ## Modeli podataka
 
 Sest povezanih modela i njihova integraciona provera opisani su u [docs/MODELI.md](docs/MODELI.md).
+
+## Cloud priprema
+
+Render Docker paket i Neon podesavanje opisani su u [docs/CLOUD.md](docs/CLOUD.md). Javni deployment jos nije potvrdjen.
