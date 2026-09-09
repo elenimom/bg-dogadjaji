@@ -76,6 +76,8 @@ jobs:
           python3 -c "import json; assert json.load(open('/tmp/openapi.json'))['openapi'] == '3.0.3'"
           curl --fail --silent --show-error http://localhost:5173/api/events -o /tmp/events.json
           python3 -c "import json; assert isinstance(json.load(open('/tmp/events.json'))['events'], list)"
+      - name: Integracioni test modela sa PostgreSQL bazom
+        run: docker compose exec -T -e RUN_DB_TESTS=1 backend node --test test/models.integration.test.js
       - name: Logovi u slucaju greske
         if: failure()
         run: docker compose logs --no-color --tail=100

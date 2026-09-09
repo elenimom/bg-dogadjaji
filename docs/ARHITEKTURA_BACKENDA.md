@@ -8,7 +8,7 @@ Kada korisnik otvori detalje dogadjaja broj 5:
 2. app.js usmerava zahtev u events/routes.js.
 3. Ruta /events/:id bira controller.details.
 4. events/controller.js proverava identifikator i poziva repository.get(5).
-5. events/repository.js izvrsava parametrizovan SQL upit preko pg biblioteke.
+5. events/repository.js poziva EventModel, koji izvrsava parametrizovan SQL upit preko pg biblioteke.
 6. PostgreSQL vraca podatke; kontroler salje JSON odgovor ili 404 ako dogadjaj ne postoji.
 7. React prikazuje odgovor korisniku.
 
@@ -20,11 +20,12 @@ izmeniti tudji dogadjaj samo promenom broja u URL-u.
 
 - Ruta: HTTP metoda, putanja, zastitne provere i izbor kontrolera.
 - Kontroler: podaci iz zahteva, validacija, poziv repozitorijuma, HTTP status i JSON odgovor.
-- Repozitorijum: citanje i upis podataka pomocu SQL upita.
+- Repozitorijum: povezuje kontrolere sa metodama odgovarajucih modela.
+- Model: predstavlja entitet i izvrsava SQL upite za njegove podatke.
 - Migracije: verzionisana struktura baze (tabele, kolone, ogranicenja).
 - Model podataka: korisnici, kategorije, lokacije, dogadjaji, sacuvani dogadjaji i sesije i njihove veze.
 
-Ne koristimo ORM; pristup podacima implementiran je pg bibliotekom i repozitorijumima.
+Ne koristimo ORM; pristup podacima implementiran je pg bibliotekom, modelima i repozitorijumima.
 Kontroleri ne sadrze SQL. Funkcije koje kreiraju kontrolere dobijaju repozitorijum
 kao argument, sto omogucava testovima da proslede zamenski repozitorijum.
 
@@ -53,3 +54,5 @@ docker compose up -d --build
 Proveriti prijavu, detalje dogadjaja i Swagger GET /health.
 Lokalni API testovi: pnpm test (31 test u trenutku ovog izdvajanja).
 Ovo izdvajanje kontrolera ne menja API adrese, tabele niti podatke.
+
+Detaljan pregled sest modela i njihovih veza: MODELI.md.

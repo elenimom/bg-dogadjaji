@@ -40,3 +40,5 @@ Prvo GitHub izvrsavanje je prekinuto sa curl 56 (connection reset by peer).
 Workflow sada proverava frontend healthcheck pre zahteva i ograniceno ponavlja
 pocetni GET zahtev i kod prekida veze. Trajna greska i dalje obara CI proveru;
 nema ignorisanja neuspesnih provera. Rezultat popravke potvrditi novim Actions izvrsavanjem.
+
+Pipeline dodatno pokrece test sest povezanih modela sa pravom PostgreSQL bazom u izolovanoj test semi. Detalji: MODELI.md.

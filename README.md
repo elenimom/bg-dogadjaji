@@ -60,3 +60,7 @@ Tok zahteva i raspored ruta, kontrolera i repozitorijuma opisani su u [docs/ARHI
 ## Automatske provere
 
 GitHub Actions konfiguracija pokrece testove, frontend build i Docker proveru na push i pull request. Detalji i status: [docs/CI_CD.md](docs/CI_CD.md). Cloud deployment jos nije podesen.
+
+## Modeli podataka
+
+Sest povezanih modela i njihova integraciona provera opisani su u [docs/MODELI.md](docs/MODELI.md).
