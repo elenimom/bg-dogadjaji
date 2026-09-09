@@ -46,10 +46,29 @@ jobs:
         run: docker compose config --quiet
       - name: Izgradnja i pokretanje kontejnera
         run: docker compose up -d --build
+      - name: Cekanje da frontend bude spreman
+        shell: bash
+        run: |
+          container_id=$(docker compose ps -q frontend)
+          test -n "$container_id"
+          for attempt in {1..30}; do
+            status=$(docker inspect --format '{{.State.Health.Status}}' "$container_id")
+            if [ "$status" = "healthy" ]; then
+              echo "Frontend i API su spremni."
+              exit 0
+            fi
+            if [ "$status" = "unhealthy" ]; then
+              echo "Frontend nije prosao proveru zdravlja."
+              exit 1
+            fi
+            sleep 2
+          done
+          echo "Frontend nije postao spreman u roku od 60 sekundi."
+          exit 1
       - name: Provera frontenda i API-ja preko Nginx-a
         shell: bash
         run: |
-          curl --fail --silent --show-error --retry 12 --retry-connrefused --retry-delay 2 http://localhost:5173/api/health -o /tmp/health.json
+          curl --fail --silent --show-error --retry 12 --retry-all-errors --retry-delay 2 http://localhost:5173/api/health -o /tmp/health.json
           python3 -c "import json; assert json.load(open('/tmp/health.json'))['status'] == 'ok'"
           curl --fail --silent --show-error http://localhost:5173/ -o /tmp/frontend.html
           grep -q 'id="root"' /tmp/frontend.html
