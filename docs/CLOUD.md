@@ -6,7 +6,7 @@ Aplikacija je uspešno postavljena na [Render](https://bg-dogadjaji.onrender.com
 
 Javni [Swagger](https://bg-dogadjaji.onrender.com/api/docs/) je 10. septembra 2026. učitao specifikaciju i kroz „Try it out“ vratio HTTP 200 za `GET /api/health`, uz `{"status":"ok","service":"bg-events-api"}`.
 
-Render Auto-Deploy opcija je zasebna provera; ciljna vrednost je **After CI Checks Pass**. Uspešan deployment sam ne potvrđuje da je ova opcija aktivna.
+Vlasnica projekta je 10. septembra 2026. potvrdila da je u Render Settings sačuvano **Auto-Deploy: After CI Checks Pass**. Podešavanje je uključeno. Za završni dokaz automatskog toka prati se novi commit: uspešne GitHub provere, pa automatski Render deployment sa statusom Live za isti commit.
 
 ## Arhitektura
 
@@ -71,7 +71,8 @@ izvrsiti zasebno preko administratorskog pristupa bazi, nikada kroz otvoren API.
 GitHub Actions gradi i pokrece i Render sliku pomocu compose.cloud-test.yaml,
 sa lokalnom probnom bazom u CI okruzenju. To nije deployment na Neon/Render.
 Render podesavanje After CI Checks Pass omogucava automatski deployment main grane
-tek nakon prolaska provera. Potvrditi na kontrolnoj tabli da je stvarno ukljuceno.
+tek nakon prolaska provera. Uključena opcija potvrđena je na kontrolnoj tabli;
+uspešan automatski tok novog commita beleži se zasebno u CI/CD dokumentaciji.
 Besplatan Render servis se uspavljuje posle neaktivnosti; prvo otvaranje moze biti sporije.
 Javni link je dodat u README. Za završnu dokumentaciju sačuvati dokaz Auto-Deploy podešavanja i odgovarajućeg uspešnog deploymenta.
 

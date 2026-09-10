@@ -103,7 +103,7 @@ Taj test koristi privremenu izolovanu šemu. Bez `RUN_DB_TESTS=1` uslovno se pre
 
 GitHub Actions na svaki push i pull request pokreće testove, gradi React, proverava lokalne Docker servise i gradi i pokreće Render sliku sa privremenom CI bazom. CI ne koristi privatnu lokalnu ili Neon bazu.
 
-Javna aplikacija je uspešno postavljena sa grane `main`. Za automatsko postavljanje tek posle prolaska provera koristi se Render opcija **After CI Checks Pass**; `render.yaml` navodi `autoDeployTrigger: checksPass`. Kod ručno kreiranog servisa tu opciju treba proveriti na Render kontrolnoj tabli — samo prisustvo YAML fajla nije potvrda aktivnog podešavanja.
+Javna aplikacija je uspešno postavljena sa grane `main`. U Render kontrolnoj tabli je 10. septembra 2026. sačuvana opcija **After CI Checks Pass**, što je vlasnica projekta potvrdila. `render.yaml` opisuje isto podešavanje kroz `autoDeployTrigger: checksPass`. Render treba da sačeka uspešne GitHub provere pre automatskog postavljanja novog commita. Završna provera ovog toka prati isti commit od zelenog Actions rezultata do automatskog Render statusa **Live**; postupak je opisan u [CI/CD dokumentaciji](docs/CI_CD.md).
 
 Uputstva i dokazi: [CI/CD](docs/CI_CD.md), [Render i Neon](docs/CLOUD.md), [Swagger](docs/SWAGGER.md). Javni Swagger je 10. septembra 2026. proveren kroz „Try it out“: `GET /api/health` vratio je HTTP 200 i `status: ok`.
 

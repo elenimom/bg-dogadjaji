@@ -23,17 +23,27 @@ GitHub workflow ne objavljuje Docker image u registru i ne poziva direktno Rende
 
 ## Automatsko postavljanje posle provera
 
-Za CI/CD tok u Render servisu podesiti:
+U Render kontrolnoj tabli sačuvano je sledeće podešavanje; vlasnica projekta ga je potvrdila 10. septembra 2026:
 
 - Branch: `main`.
 - Auto-Deploy: **After CI Checks Pass**.
 
-`render.yaml` sadrži `autoDeployTrigger: checksPass`. Kod ručno kreiranog servisa ovo nije dokaz podešavanja na kontrolnoj tabli. Dok se izabrana vrednost ne potvrdi, potvrđeni su uspešan CI i javni deployment, a uslov za automatsko postavljanje ostaje za proveru.
+`render.yaml` sadrži odgovarajući `autoDeployTrigger: checksPass`. Potvrda aktivne opcije dolazi iz Render Settings prikaza, a ne samo iz YAML fajla. Podešavanje je potvrđeno; završna provera automatskog postavljanja novog commita još treba da zabeleži uspešan CI i Render Live za isti commit.
 
-Kada je opcija aktivna, Render čeka uspešne provere novog commita na `main`, pa pokreće novu verziju. Push na `develop` pokreće CI, ali ne menja produkciju povezanu sa `main`.
+Sa ovom opcijom Render čeka uspešne provere novog commita na `main`, pa pokreće novu verziju. Push na `develop` pokreće CI, ali ne menja produkciju povezanu sa `main`.
 
 Za seminarski rad sačuvati najnoviji zeleni Actions rezultat, Render opciju Auto-Deploy i uspešan deployment istog commita. [Render dokumentacija](https://render.com/docs/deploys#integrating-with-ci).
 
 ## Spremnost kontejnera
 
 Pokrenut kontejner ne mora odmah primati HTTP zahteve. Prvo izvršavanje je zato imalo curl grešku 56. Ispravka u commitu `f9c04ac` dodaje čekanje healthcheck-a i ograničeno ponavljanje početnog GET zahteva. Naknadne provere su prošle; trajna greška i dalje obara CI.
+
+## Završna provera automatskog toka
+
+1. Sačuvati ovu dopunu dokumentacije u novi commit i poslati granu `main` na GitHub.
+2. Zabeležiti oznaku commita i otvoriti njegovo Actions izvršavanje za `main`. Sačekati da oba posla završe uspešno.
+3. U Render Deploys proveriti da je bez korišćenja Manual Deploy pokrenuto postavljanje tog istog commita i da je završilo statusom **Live**.
+4. Otvoriti javnu aplikaciju i proveriti `GET /api/health` kroz Swagger.
+5. Sačuvati slike zelenih provera, Render Live prikaza sa oznakom istog commita i opcije After CI Checks Pass za seminarsku dokumentaciju.
+
+Ne pokretati ručni deployment tokom ove provere, jer on ne dokazuje da je postavljanje automatski sačekalo CI. Ako novo automatsko postavljanje izostane ili ne uspe, pregledati njegov status i logove pre zaključka da je tok potvrđen.
