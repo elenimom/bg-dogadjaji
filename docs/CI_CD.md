@@ -1,44 +1,39 @@
-# Automatske provere na GitHub-u
+# Automatske provere i javno postavljanje
 
-Workflow je u .github/workflows/ci.yml.
-Pokrece se na push i pull request, kao i rucno kroz Actions > Run workflow
-(kada workflow postoji na podrazumevanoj grani).
+Workflow je u [.github/workflows/ci.yml](../.github/workflows/ci.yml). Pokreće se na svaki push i pull request, kao i ručno kroz GitHub Actions.
 
-## Sta GitHub radi
+## Šta GitHub proverava
 
-1. Preuzima kod iz commita koji proverava.
-2. Priprema Node.js 24 i pnpm 11.19.0.
-3. Instalira verzije biblioteka prema pnpm-lock.yaml (frozen lockfile).
-4. Pokrece API testove i gradi React frontend.
-5. Ako provere prodju, u drugom poslu gradi Docker slike i pokrece Compose.
-6. Migracije pripreme privremenu CI bazu.
-7. Ceka da frontend prodje Docker healthcheck (najvise 60 sekundi), zatim proverava stranicu, API health, Swagger specifikaciju i listu dogadjaja kroz Nginx.
-8. Zaustavlja CI kontejnere; pri gresci prikazuje logove za dijagnostiku.
+1. Preuzima kod konkretnog commita i priprema Node.js 24 i pnpm 11.19.0.
+2. Instalira zaključane verzije zavisnosti, pokreće API testove i gradi React frontend.
+3. Posle uspeha prvog posla proverava Compose konfiguraciju, gradi slike i pokreće servise.
+4. Primenjuje migracije na privremenu CI bazu i čeka spremnost frontend kontejnera.
+5. Preko Nginx-a proverava početnu stranicu, API health, OpenAPI specifikaciju i listu događaja.
+6. Izvršava integracioni test šest povezanih modela sa stvarnim PostgreSQL serverom u izolovanoj šemi.
+7. Pomoću `compose.cloud-test.yaml` gradi i pokreće sliku iz `Dockerfile.render`, zatim proverava njen health, direktno otvaranje `/events` i događaje iz API-ja.
+8. Pri grešci prikazuje ograničene logove, a na kraju zaustavlja privremene CI kontejnere.
 
-CI okruzenje je poseban privremeni racunar na GitHub-u. Koristi sopstvenu
-probnu lozinku i praznu bazu. Ne pristupa bazi na racunaru autora niti zahteva
-kopiranje licnog .env fajla. Provera /api/events koristi stvarnu PostgreSQL bazu
-u CI okruzenju, dok postojeci API testovi uglavnom koriste zamenske repozitorijume.
+CI koristi zasebnu privremenu bazu, ne privatni `.env`, lokalne korisničke podatke ili Neon bazu. Većina API testova koristi zamenske repozitorijume; test modela i Docker provere rade sa stvarnim PostgreSQL serverom.
 
-## Status i ogranicenja
+## Potvrđeno stanje
 
-Pipeline je pripremljen lokalno. Uspesno izvrsavanje na GitHub-u potvrdjuje se
-zelenim statusom tek nakon slanja commita. Samo postojanje YAML fajla nije dokaz
-uspesnog CI izvrsavanja.
+Uspešno GitHub Actions izvršavanje za Cloud commit `97614b1` potvrđeno je zelenim statusom. Render je potom uspešno postavio aplikaciju na [javnu adresu](https://bg-dogadjaji.onrender.com). To su zasebni koraci: CI proverava verziju koda, a deployment je pokreće na javnom serveru.
 
-Ova verzija implementira kontinuiranu integraciju (CI): testove, build i proveru
-pokretanja. Ne objavljuje Docker slike u registru i jos ne postavlja aplikaciju
-na Cloud. Javna produkcija i automatsko postavljanje predstavljaju naredni korak.
+GitHub workflow ne objavljuje Docker image u registru i ne poziva direktno Render deploy hook. Render je povezan sa GitHub repozitorijumom i sam gradi sliku na osnovu `Dockerfile.render`.
 
-Za dokumentaciju sacuvati sliku uspesnog Actions izvrsavanja, naziv commita i
-objasnjenje poslova. GitHub: https://docs.github.com/en/actions/tutorials/build-and-test-code/nodejs
+## Automatsko postavljanje posle provera
+
+Za CI/CD tok u Render servisu podesiti:
+
+- Branch: `main`.
+- Auto-Deploy: **After CI Checks Pass**.
+
+`render.yaml` sadrži `autoDeployTrigger: checksPass`. Kod ručno kreiranog servisa ovo nije dokaz podešavanja na kontrolnoj tabli. Dok se izabrana vrednost ne potvrdi, potvrđeni su uspešan CI i javni deployment, a uslov za automatsko postavljanje ostaje za proveru.
+
+Kada je opcija aktivna, Render čeka uspešne provere novog commita na `main`, pa pokreće novu verziju. Push na `develop` pokreće CI, ali ne menja produkciju povezanu sa `main`.
+
+Za seminarski rad sačuvati najnoviji zeleni Actions rezultat, Render opciju Auto-Deploy i uspešan deployment istog commita. [Render dokumentacija](https://render.com/docs/deploys#integrating-with-ci).
 
 ## Spremnost kontejnera
 
-Pokrenut kontejner ne mora odmah biti spreman da primi HTTP zahtev.
-Prvo GitHub izvrsavanje je prekinuto sa curl 56 (connection reset by peer).
-Workflow sada proverava frontend healthcheck pre zahteva i ograniceno ponavlja
-pocetni GET zahtev i kod prekida veze. Trajna greska i dalje obara CI proveru;
-nema ignorisanja neuspesnih provera. Rezultat popravke potvrditi novim Actions izvrsavanjem.
-
-Pipeline dodatno pokrece test sest povezanih modela sa pravom PostgreSQL bazom u izolovanoj test semi. Detalji: MODELI.md.
+Pokrenut kontejner ne mora odmah primati HTTP zahteve. Prvo izvršavanje je zato imalo curl grešku 56. Ispravka u commitu `f9c04ac` dodaje čekanje healthcheck-a i ograničeno ponavljanje početnog GET zahteva. Naknadne provere su prošle; trajna greška i dalje obara CI.

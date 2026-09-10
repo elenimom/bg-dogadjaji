@@ -2,9 +2,11 @@
 
 ## Status
 
-Kod je pripremljen za javno postavljanje. Render servis, povezivanje sa Neon bazom,
-javni URL i uspesan deployment moraju se zasebno potvrditi. Ne unositi status
-uspesnog Cloud postavljanja u seminarski rad dok aplikacija ne proradi na javnoj adresi.
+Aplikacija je uspešno postavljena na [Render](https://bg-dogadjaji.onrender.com), sa PostgreSQL bazom na Neonu. Render log je potvrdio „Your service is live“. Korisnica je potvrdila registraciju, administratorski pristup i tok kreiranja demonstracionog događaja, lokacije, mape, prognoze i čuvanja događaja.
+
+Javni [Swagger](https://bg-dogadjaji.onrender.com/api/docs/) je 10. septembra 2026. učitao specifikaciju i kroz „Try it out“ vratio HTTP 200 za `GET /api/health`, uz `{"status":"ok","service":"bg-events-api"}`.
+
+Render Auto-Deploy opcija je zasebna provera; ciljna vrednost je **After CI Checks Pass**. Uspešan deployment sam ne potvrđuje da je ova opcija aktivna.
 
 ## Arhitektura
 
@@ -49,7 +51,7 @@ ne oba, da ne napravimo duplikat. Prvi deployment se proverava u Render logovima
 
 ## Podaci i nalog
 
-Neon je posebna prazna baza; lokalni korisnici i dogadjaji ne prenose se automatski.
+Neon koristi zasebnu bazu, koja je pri prvom postavljanju bila prazna; lokalni korisnici i događaji ne prenose se automatski.
 Migracije prave tabele. SEED_DEMO=true dodaje samo oznacene izmisljene dogadjaje,
 bez javnih pristupnih lozinki. Posle prvog uspesnog unosa vratiti ga na false.
 Na javnoj aplikaciji registrovati korisnicki nalog. Promenu njegove uloge u admin
@@ -71,7 +73,7 @@ sa lokalnom probnom bazom u CI okruzenju. To nije deployment na Neon/Render.
 Render podesavanje After CI Checks Pass omogucava automatski deployment main grane
 tek nakon prolaska provera. Potvrditi na kontrolnoj tabli da je stvarno ukljuceno.
 Besplatan Render servis se uspavljuje posle neaktivnosti; prvo otvaranje moze biti sporije.
-Javni URL dodati u README i zavrsnu dokumentaciju kada bude poznat.
+Javni link je dodat u README. Za završnu dokumentaciju sačuvati dokaz Auto-Deploy podešavanja i odgovarajućeg uspešnog deploymenta.
 
 Reference:
 - https://render.com/docs/web-services
