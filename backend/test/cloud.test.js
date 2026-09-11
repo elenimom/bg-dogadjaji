@@ -29,7 +29,7 @@ test('Cloud prikazuje React rute i zadrzava JSON greske za API i nedostajuce faj
     for (const path of ['/','/events/5','/account','/saved','/admin']) {
       const r = await request(app).get(path).set('Accept','text/html').expect(200);
       assert.match(r.text,/Test frontend/);
-      assert.match(r.headers['content-security-policy'],/https:\/\/tile.openstreetmap.org/);
+      assert.match(r.headers['content-security-policy'], /https:\/\/\*\.basemaps\.cartocdn\.com/);
       assert.match(r.headers['content-security-policy'],/upgrade-insecure-requests/);
     }
     for (const path of ['/api/missing','/api','/missing.js']) {
