@@ -13,7 +13,7 @@ import { authRoutes } from './auth/routes.js';
 export function createApp({ repository, events, admin, origin, secure = false, frontendDir, trustProxy = false } = {}) {
   const app = express();
   app.set('trust proxy', trustProxy);
-  app.use(helmet({ contentSecurityPolicy: { directives: { 'upgrade-insecure-requests': secure ? [] : null, 'img-src': ["'self'", 'data:', 'https://tile.openstreetmap.org'], 'connect-src': ["'self'"] } } }));
+  app.use(helmet({ contentSecurityPolicy: { directives: { 'upgrade-insecure-requests': secure ? [] : null, 'img-src': ["'self'", 'data:', 'https://*.basemaps.cartocdn.com'], 'connect-src': ["'self'"] } } }));
   app.use('/api', docsRoutes());
   app.use(express.json({ limit: '32kb' }));
   app.get('/api/health', (_req, res) => res.json({ status: 'ok', service: 'bg-events-api' }));
