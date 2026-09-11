@@ -7,7 +7,13 @@ export function EventsMap({events}){
  const ref=useRef();const mapRef=useRef();const [error,setError]=useState('');
  useEffect(()=>{
   const map=L.map(ref.current,{scrollWheelZoom:false}).setView([44.8178,20.4569],12);mapRef.current=map;
-  const tiles=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'}).addTo(map);
+const tiles=L.tileLayer(
+  'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+  {
+    maxZoom:19,
+    attribution:'&copy; OpenStreetMap contributors &copy; CARTO'
+  }
+).addTo(map);
   tiles.on('tileerror',()=>setError('Podloga mape trenutno nije dostupna. Koristite listu događaja.'));
   const groups=new Map(),points=[];const colors=['#36512b','#9b4632','#66509b','#957014'];
   for(const e of events){
